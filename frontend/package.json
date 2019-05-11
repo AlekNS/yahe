@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Yet Another Hyperledger Explorer Frontend",
   "author": "Alexander Sedelnikov",
-  "license": "ISC",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "start": "react-scripts start",

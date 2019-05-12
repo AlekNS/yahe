@@ -1,0 +1,6 @@
+cache:
+  externalStorage: postgres://postgres:postgres@localhost:5432/postgres
+
+endpoints:
+  http:
+    bind: :8080

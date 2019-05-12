@@ -1,0 +1,24 @@
+FROM golang:1.12 as builder
+
+WORKDIR /home/yahe-explorer
+
+COPY . .
+RUN make build
+
+
+
+FROM alpine:3.9
+
+WORKDIR /home/yahe-explorer
+COPY entrypoint.sh /
+RUN chmod 755 /entrypoint.sh && adduser -D yahe-explorer
+
+COPY config.explorer.base.yaml /etc/yahe-explorer/config.yaml
+
+USER yahe
+
+COPY --from=builder /home/yahe-explorer/bin/yahe-explorer .
+
+EXPOSE 8080
+ENTRYPOINT ["/entrypoint.sh", "/home/yahe-explorer/yahe-explorer"]
+CMD ["api", "serve"]

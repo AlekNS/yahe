@@ -5,21 +5,23 @@ import (
 	"strings"
 
 	"github.com/alekns/yahe/internal/auth/app"
+	"github.com/alekns/yahe/internal/auth/config"
 	"github.com/jmoiron/sqlx"
 	uuid "github.com/satori/go.uuid"
 )
 
 type (
 	userSqlx struct {
-		ID           string `db:"id"`
-		Name         string `db:"name"`
-		Login        string `db:"login"`
-		PasswordHash string `db:"password_hash"`
-		IsActive     bool   `db:"is_active"`
+		ID           string
+		Name         string
+		Login        string
+		PasswordHash string
+		IsActive     bool
 	}
 
 	userRepositoryServiceSqlx struct {
-		db *sqlx.DB
+		db       *sqlx.DB
+		settings *config.UsersSettings
 	}
 )
 
@@ -39,10 +41,9 @@ func (ur *userRepositoryServiceSqlx) GetByLogin(tenantID app.TenantID,
 
 	var userDto = &userSqlx{}
 
-	var err = ur.db.Get(userDto, ur.db.Rebind(`
-SELECT u.id, u.name, u.login, u.password_hash, u.is_active
-FROM "users" u where u.login = ? LIMIT 1
-`), login)
+	row := ur.db.QueryRow(
+		ur.db.Rebind(ur.settings.SQLUserByLogin), login)
+	err := row.Scan(&userDto.ID, &userDto.Name, &userDto.Login, &userDto.PasswordHash, &userDto.IsActive)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -59,10 +60,9 @@ func (ur *userRepositoryServiceSqlx) GetByIDs(tenantID app.TenantID,
 
 	var userDto = &userSqlx{}
 
-	var err = ur.db.Get(userDto, ur.db.Rebind(`
-SELECT u.id, u.name, u.login, u.password_hash, u.is_active
-FROM "users" u where u.id = ? LIMIT 1
-`), userID)
+	row := ur.db.QueryRow(ur.db.Rebind(
+		ur.settings.SQLUserByID), userID)
+	err := row.Scan(&userDto.ID, &userDto.Name, &userDto.Login, &userDto.PasswordHash, &userDto.IsActive)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -77,10 +77,8 @@ FROM "users" u where u.id = ? LIMIT 1
 func (ur *userRepositoryServiceSqlx) Save(user *app.User) (*app.User, error) {
 	if len(user.ID) == 0 {
 		uuidValue := uuid.NewV4().String()
-		_, err := ur.db.Exec(ur.db.Rebind(`
-INSERT INTO "users" (id, created_at, updated_at, name, login, password_hash)
-VALUES (?, now(), now(), ?, ?, ?)
-`), uuidValue, user.Name, user.Login, user.Password)
+		_, err := ur.db.Exec(ur.db.Rebind(
+			ur.settings.SQLUserInsert), uuidValue, user.Name, user.Login, user.Password, user.IsActive)
 		if err != nil {
 			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 				return nil, app.ErrorUserAlreadyExists
@@ -92,10 +90,8 @@ VALUES (?, now(), now(), ?, ?, ?)
 		return user, nil
 	}
 
-	_, err := ur.db.Exec(ur.db.Rebind(`
-UPDATE "users" SET updated_at = now(), password_hash = ?
-WHERE id = ?
-`), user.Password, user.ID)
+	_, err := ur.db.Exec(ur.db.Rebind(
+		ur.settings.SQLUserUpdate), user.Password, user.IsActive, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +100,9 @@ WHERE id = ?
 }
 
 // NewUserRepositoryServiceSqlx .
-func NewUserRepositoryServiceSqlx(db *sqlx.DB) app.UserRepositoryService {
+func NewUserRepositoryServiceSqlx(settings *config.UsersSettings, db *sqlx.DB) app.UserRepositoryService {
 	return &userRepositoryServiceSqlx{
-		db: db,
+		db:       db,
+		settings: settings,
 	}
 }

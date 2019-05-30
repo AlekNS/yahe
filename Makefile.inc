@@ -12,7 +12,7 @@ bin/%: $(go_src)
 	$(eval bin_name=$(patsubst bin/%,%,$@))
 	@mkdir -p bin
 	@echo "Building bin $(bin_name)"
-	@cd ./cmd/$(bin_name) && go build -o ../../bin/$(bin_name) -ldflags "-w -linkmode external -extldflags '-static'" main.go
+	@cd ./cmd/$(bin_name) && go build -o ../../bin/$(bin_name) -ldflags "-w -extldflags '-static'" main.go
 	@echo "Done"
 
 test:

@@ -82,8 +82,8 @@ type (
 
 	RequestPolicyVerifyPolicy struct {
 	    ModelID string `json:"modelId"`
-	    Tuples  
-	    Objects 
+	    Tuples
+	    Objects
 	}
 
 	RequestPolicyVerify struct {

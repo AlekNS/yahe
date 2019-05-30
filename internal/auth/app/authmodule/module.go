@@ -19,14 +19,17 @@ func GetModule() *inversify.Module {
 			// Services
 			//
 
-			c.Bind(auth.UserRepositoryServiceSymbol).ToFactory(func(sqlxDbArg inversify.Any) (inversify.Any, error) {
+			c.Bind(auth.UserRepositoryServiceSymbol).ToFactory(func(conf, sqlxDbArg inversify.Any) (inversify.Any, error) {
+				settings := conf.(*config.Settings)
 				sqlxDb := sqlxDbArg.(*sqlx.DB)
-				return services.NewUserRepositoryServiceSqlx(sqlxDb), nil
-			}, inversify.Named((*sqlx.DB)(nil), "user"))
+
+				return services.NewUserRepositoryServiceSqlx(settings.Users, sqlxDb), nil
+			}, (*config.Settings)(nil), inversify.Named((*sqlx.DB)(nil), "user"))
 
 			c.Bind(auth.JwtRepositoryServiceSymbol).ToFactory(func(conf, redisConn inversify.Any) (inversify.Any, error) {
 				settings := conf.(*config.Settings)
 				redisClient := redisConn.(*redis.Client)
+
 				return services.NewJwtRepositoryServiceRedis(settings.Jwt.KeysPrefix, redisClient), nil
 			}, (*config.Settings)(nil), inversify.Named((*redis.Client)(nil), "jwt"))
 
@@ -37,6 +40,7 @@ func GetModule() *inversify.Module {
 
 			c.Bind(auth.JwtServiceSymbol).ToFactory(func(conf inversify.Any) (inversify.Any, error) {
 				settings := conf.(*config.Settings)
+
 				return services.NewJwtServiceImpl(settings), nil
 			}, (*config.Settings)(nil))
 

@@ -25,6 +25,7 @@ func usersSettingsGetAndValidate(v *viper.Viper) *UsersSettings {
 	)
 
 	// Setup defaults
+	v.SetDefault(kusersstorageurl, "postgres://postgres:postgres@localhost:5432/postgres")
 
 	// Validations
 	storageURL, err := url.Parse(v.GetString(kusersstorageurl))

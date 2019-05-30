@@ -31,6 +31,7 @@ func jwtSettingsGetAndValidate(v *viper.Viper) *JwtSettings {
 	)
 
 	// Setup defaults
+	v.SetDefault(kjwtstorageurl, "redis://localhost:6379/1")
 	v.SetDefault(kjwtalgorithm, "HS256")
 	v.SetDefault(kjwtdefaultexp, 604800)
 	v.SetDefault(kjwtkeyprefix, "pa.")

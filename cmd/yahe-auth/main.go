@@ -7,18 +7,17 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/alekns/yahe/internal/explorer"
-	cmds "github.com/alekns/yahe/internal/explorer/presentation/commands"
+	"github.com/alekns/yahe/internal/auth"
+	cmds "github.com/alekns/yahe/internal/auth/presentation/commands"
 )
 
 var mainCommand = &cobra.Command{
-	Use:     explorer.ServiceName,
-	Short:   "Hyperledger Explorer Service",
-	Long:    explorer.ServiceDesc,
-	Version: explorer.ServiceVersion}
+	Use:     auth.ServiceName,
+	Long:    auth.ServiceDesc,
+	Version: auth.ServiceVersion}
 
 func main() {
-	viper.SetEnvPrefix("yahee")
+	viper.SetEnvPrefix("yahea")
 	viper.AutomaticEnv()
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)

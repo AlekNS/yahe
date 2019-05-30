@@ -9,6 +9,7 @@ import (
 // Settings gathering all application settings.
 type Settings struct {
 	Logger *config.LoggerSettings
+	HTTP   *config.HTTPSettings
 	Jwt    *JwtSettings
 	Users  *UsersSettings
 }
@@ -17,6 +18,7 @@ type Settings struct {
 func GetSettings(viper *viper.Viper) *Settings {
 	return &Settings{
 		Logger: config.FromViperLoggerSettings(viper),
+		HTTP:   config.FromViperHTTPSettings(viper),
 		Jwt:    jwtSettingsGetAndValidate(viper),
 		Users:  usersSettingsGetAndValidate(viper),
 	}

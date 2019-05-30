@@ -21,6 +21,7 @@ func FromViperLoggerSettings(v *viper.Viper) *LoggerSettings {
 
 	// Validations
 	level := v.GetString(kconsolelevel)
+
 	switch level {
 	case "debug", "info", "warn", "error":
 	default:

@@ -95,6 +95,8 @@ func (ja *jwtAppImpl) Create(tenantID app.TenantID,
 		},
 	}
 
+	logger.Debug("Store to jwt repository")
+
 	_, err = ja.jwtRepository.Save(token)
 	if err != nil {
 		return "", err
@@ -120,6 +122,8 @@ func (ja *jwtAppImpl) Validate(tenantID app.TenantID, token app.JwtEncoded) (*ap
 		return nil, app.ErrorInvalidJwtToken
 	}
 
+	logger.Debugf("Get by id: %v", tokenAttrs)
+
 	tokenEntity, err := ja.jwtRepository.GetByIDs(tenantID,
 		tokenAttrs["user"].(string), tokenAttrs["id"].(string))
 	if err != nil {
@@ -140,6 +144,8 @@ func (ja *jwtAppImpl) Invalidate(tenantID app.TenantID, token app.JwtEncoded) er
 	if err != nil {
 		return app.ErrorInvalidJwtToken
 	}
+
+	logger.Debugf("Get by id: %v", tokenAttrs)
 
 	tokenEntity, err := ja.jwtRepository.GetByIDs(tenantID,
 		tokenAttrs["user"].(string), tokenAttrs["id"].(string))

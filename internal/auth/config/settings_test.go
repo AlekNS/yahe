@@ -24,6 +24,7 @@ func TestDefaultSettingsSpec(t *testing.T) {
 				c.So(settings.Logger, ShouldNotBeNil)
 				c.So(settings.Jwt, ShouldNotBeNil)
 				c.So(settings.Users, ShouldNotBeNil)
+				c.So(settings.HTTP, ShouldNotBeNil)
 			})
 		})
 	})

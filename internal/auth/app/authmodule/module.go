@@ -13,6 +13,7 @@ import (
 // GetModule .
 func GetModule() *inversify.Module {
 	return inversify.NewModule("auth").
+		//
 		Register(func(c inversify.ContainerBinder) error {
 			//
 			// Services
@@ -21,17 +22,17 @@ func GetModule() *inversify.Module {
 			c.Bind(auth.UserRepositoryServiceSymbol).ToFactory(func(sqlxDbArg inversify.Any) (inversify.Any, error) {
 				sqlxDb := sqlxDbArg.(*sqlx.DB)
 				return services.NewUserRepositoryServiceSqlx(sqlxDb), nil
-			}, (*sqlx.DB)(nil))
+			}, inversify.Named((*sqlx.DB)(nil), "user"))
 
 			c.Bind(auth.JwtRepositoryServiceSymbol).ToFactory(func(conf, redisConn inversify.Any) (inversify.Any, error) {
 				settings := conf.(*config.Settings)
 				redisClient := redisConn.(*redis.Client)
 				return services.NewJwtRepositoryServiceRedis(settings.Jwt.KeysPrefix, redisClient), nil
-			}, (*config.Settings)(nil), (*redis.Client)(nil))
+			}, (*config.Settings)(nil), inversify.Named((*redis.Client)(nil), "jwt"))
 
 			c.Bind(auth.PasswordServiceSymbol).ToFactory(func(conf inversify.Any) (inversify.Any, error) {
-				// settings := conf.(*config.Settings)
-				return services.NewPasswordServiceBcrypt(16), nil
+				// @TODO: from settings := conf.(*config.Settings)
+				return services.NewPasswordServiceBcrypt(10), nil
 			}, (*config.Settings)(nil))
 
 			c.Bind(auth.JwtServiceSymbol).ToFactory(func(conf inversify.Any) (inversify.Any, error) {
@@ -78,6 +79,7 @@ func GetModule() *inversify.Module {
 
 			return nil
 		}).
+		//
 		UnRegister(func(c inversify.ContainerBinder) error {
 			c.Unbind(auth.UserRepositoryServiceSymbol)
 			c.Unbind(auth.JwtRepositoryServiceSymbol)

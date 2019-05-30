@@ -32,6 +32,6 @@ var (
 	ErrorPasswordMismatch = errors.New("password mismatch")
 
 	//
-	// Authorezation
+	// Authorization
 	//
 )

@@ -1,9 +1,12 @@
-package explorer
+package auth
 
 const (
 	// ServiceName .
-	ServiceName = "yahe-auth"
+	ServiceName = "auth"
 
 	// ServiceVersion .
 	ServiceVersion = "0.0.1"
+
+	// ServiceDesc .
+	ServiceDesc = "Authentication and Authorization service"
 )

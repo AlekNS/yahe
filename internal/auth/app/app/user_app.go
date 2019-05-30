@@ -84,6 +84,8 @@ func (ua *userAppImpl) GetUserBy(tenantID app.TenantID, login string, password s
 		return nil, app.ErrorNotFound
 	}
 
+	logger.Debug("Check password")
+
 	result, err := ua.checkUserPassword(password, user)
 	if err != nil {
 		return nil, err
@@ -115,6 +117,8 @@ func (ua *userAppImpl) ChangePassword(tenantID app.TenantID, userID app.UserID, 
 		return nil, app.ErrorUserIsNotActive
 	}
 
+	logger.Debug("Check password")
+
 	result, err := ua.checkUserPassword(oldPassword, user)
 	if err != nil {
 		return nil, err
@@ -127,6 +131,8 @@ func (ua *userAppImpl) ChangePassword(tenantID app.TenantID, userID app.UserID, 
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Debug("Save user to repository")
 
 	user, err = ua.userRepository.Save(user)
 	if err != nil {
@@ -162,6 +168,8 @@ func (ua *userAppImpl) ResetPassword(tenantID app.TenantID, userID app.UserID, n
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Debug("Save user to repository")
 
 	user, err = ua.userRepository.Save(user)
 	if err != nil {
